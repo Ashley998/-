@@ -1,0 +1,17 @@
+import jieba 
+sentence='精确匹配是怎么一回事呀'
+#精确匹配
+split=jieba.cut(sentence,cut_all=False)
+for item in split
+  print(item)
+split=jieba.cut(sentence,cut_all=False)
+for item in split:
+  print(item)
+#全模式
+split1=jieba.cut(sentence,cut_all=True)
+for item1 in split1:
+  print(item1)
+#搜索引擎模式
+split2=jieba.cut_for_search(sentence,cut_all=True)
+for item2 in split2:
+  print(item2)
