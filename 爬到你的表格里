@@ -1,0 +1,45 @@
+import requests
+from lxml import etree
+import csv
+import time
+import re
+
+headers = {
+    'Referer': 'http://www.nhc.gov.cn/cms-search/xxgk/searchList.htm?type=search',
+    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:70.0) Gecko/20100101 Firefox/70.0',
+    'Host': 'www.nhc.gov.cn'
+}
+session = requests.Session()
+with open('tt.csv', 'r') as f:
+    reader = csv.reader(f)
+    count = 0
+    for url in reader:
+        list = []
+        try:
+            response = session.get(url[0], headers=headers, timeout=5)
+            text = response.content.decode('utf8')
+            html = etree.HTML(text)
+            try:
+                date = re.findall(r'<td>(.*?)</td>', text, re.S)
+                time_ = date[-1]
+                jigou = date[-3]
+                title = html.xpath("//div[@class='title']/text()")[0]
+                ps = html.xpath("//div[@class='con_font']//text()")
+                words = ''
+                for p in ps:
+                    words += p
+                words = words.strip().replace(' ', '').replace('&ensp;', '')
+                list.append(title)
+                list.append(time_)
+                list.append(jigou)
+                list.append(words)
+                with open('message.csv', 'a', encoding='utf8', newline='') as fp:
+                    writer = csv.writer(fp)
+                    writer.writerow(list)
+            except Exception as e:
+                print(e)
+        except requests.exceptions.RequestException as e:
+            print(e)
+        count += 1
+        print(count)
+        time.sleep(0.1)
