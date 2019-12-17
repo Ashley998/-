@@ -22,4 +22,30 @@ for item3 in w1:
   print(item3.word+"___"+item3.flag)
 #加载自定义词典
 jieba.load_userdict("")#加载的路径
+sentence='啊啊啊啊啊'
+w2=jieba.cut(sentence)
+for item4 in w2:
+  print(item4)
+#import jieba.analyse
+#文档频率tf-idf
+sentence='aaaaa'
+tag=jieba.analyse.extract_tags(sentence,3,withWeight=True)#赋予相应的权重
+print(tag)
+#TextRank 算法的关键词抽取
+sentence='aaaaa'
+tag=jieba.analyse.textRank(sentence,3,withWeight=True)
+print(tag)
 
+
+from collections import Counter
+sentence ='aaaaa'
+stepwords=['一个吻','的']
+split=jieba.cut(sentence)
+lst=[]
+for i in split:
+  if (i not in stopwprds):
+    #print(i)
+    lst.append(i)
+print(lst)
+print(Counter(lst))
+ 
