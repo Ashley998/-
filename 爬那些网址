@@ -1,0 +1,69 @@
+import requests
+from lxml import etree
+import time
+import csv
+
+
+URL_LIST = [
+    'http://www.nhc.gov.cn/bgt/zcwj2/new_zcwj{}.shtml',
+    'http://www.nhc.gov.cn/renshi/zcwj2/new_zcwj{}.shtml',
+    'http://www.nhc.gov.cn/guihuaxxs/zcwj2/zcwj{}.shtml',
+    'http://www.nhc.gov.cn/caiwusi/zcwj2/new_zcwj{}.shtml',
+    'http://www.nhc.gov.cn/fzs/zcwj2/new_zcwj{}.shtml',
+    'http://www.nhc.gov.cn/tigs/zcwj2/new_zcwj{}.shtml',
+    'http://www.nhc.gov.cn/jkj/zcwj2/new_zcwj{}.shtml',
+    'http://www.nhc.gov.cn/yzygj/zcwj2/new_zcwj{}.shtml',
+    'http://www.nhc.gov.cn/jws/zcwj2/new_zcwj{}.shtml',
+    'http://www.nhc.gov.cn/yjb/zcwj2/zcwj{}.shtml',
+    # 'http://www.nhc.gov.cn/qjjys/zcwj2/new_zcwj{}.shtml',
+    # 'http://www.nhc.gov.cn/zhjcj/zcwj2/zcwj{}.shtml',
+    # 'http://www.nhc.gov.cn/yaozs/zcwj2/new_zcwj{}.shtml',
+    # 'http://www.nhc.gov.cn/sps/zcwj2/zcwj{}.shtml',
+    # 'http://www.nhc.gov.cn/lljks/zcwj2/new_list{}.shtml',
+    # 'http://www.nhc.gov.cn/fys/zcwj2/new_zcwj{}.shtml',
+    # 'http://www.nhc.gov.cn/zyjks/zcwj2/new_list{}.shtml',
+    # 'http://www.nhc.gov.cn/rkjcyjtfzs/zcwj2/new_list{}.shtml',
+    # 'http://www.nhc.gov.cn/xcs/zcwj2/new_zcwj{}.shtml',
+    # 'http://www.nhc.gov.cn/gjhzs/zcwj2/zcwj{}.shtml',
+    # 'http://www.nhc.gov.cn/jgdw/zcwj2/zcwj{}.shtml',
+    # 'http://www.nhc.gov.cn/ltj/pzhgli/new_list{}.shtml',
+]
+
+
+def get_all_url(url, session):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3314.0 Safari/537.36 SE 2.X MetaSr 1.0'
+    }
+    for i in range(10):
+        if i == 0:
+            new_url = url.format('')
+        else:
+            s = '_' + str(i+1)
+            new_url=url.format(s)
+        response = session.get(new_url, headers=headers)
+        text = response.content.decode('utf8')
+        html = etree.HTML(text)
+        a_link = html.xpath("//ul[@class='zxxx_list zcwjlist']//li//a")
+        for a in a_link:
+            _url = a.xpath("@href")[0]
+            _url = 'http://www.nhc.gov.cn/' + _url
+            write_csv_file(_url)
+            print(_url)
+        time.sleep(1)
+    time.sleep(1)
+
+
+def write_csv_file(url):
+    with open('all_url.csv', 'a', encoding='utf8',newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow([url])
+
+
+def main():
+    session = requests.Session()
+    for url in URL_LIST:
+        get_all_url(url, session)
+
+
+if __name__ == '__main__':
+    main()
