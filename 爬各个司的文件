@@ -1,0 +1,123 @@
+import requests
+import csv
+from lxml import etree
+import time
+import re
+
+SESSION = requests.Session()
+title_list = []
+mecha_list = []
+time_list = []
+content_list = []
+
+
+def parse_url(url):
+    print(url)
+    me = re.findall(r'gov.cn//(.*?)/', url)
+    try:
+        me = me[0]
+        if me == 'bgt':
+            mecha_list.append('办公厅')
+        elif me == 'renshi':
+            mecha_list.append('人事司')
+        elif me == 'guihuaxxs':
+            mecha_list.append('规划发展与信息化司')
+        elif me == 'caiwusi':
+            mecha_list.append('财务司')
+        elif me == 'fzs':
+            mecha_list.append('法规司')
+        elif me == 'tigs':
+            mecha_list.append('体制改革司')
+        elif me == 'jkj':
+            mecha_list.append('疾病预防控制局')
+        elif me == 'yzygj':
+            mecha_list.append('医政医管局')
+        elif me == 'jws':
+            mecha_list.append('基层卫生健康司')
+        elif me == 'yjb':
+            mecha_list.append('卫生应急办公室')
+        elif me == 'qjjys':
+            mecha_list.append('科技教育司')
+        elif me == 'zhjcj':
+            mecha_list.append('综合监督局')
+        elif me == 'yaozs':
+            mecha_list.append('药物政策与基本药物制度司')
+        elif me == 'sps':
+            mecha_list.append('食品安全标准与监测评估司')
+        elif me == 'lljks':
+            mecha_list.append('老龄健康司')
+        elif me == 'fys':
+            mecha_list.append('妇幼健康司')
+        elif me == 'zyjks':
+            mecha_list.append('职业健康司')
+        elif me == 'rkjcyjtfzs':
+            mecha_list.append('人口监测与家庭发展司')
+        elif me == 'xcs':
+            mecha_list.append('宣传司')
+        elif me == 'gjhzs':
+            mecha_list.append('国际合作司')
+        elif me == 'jgdw':
+            mecha_list.append('机关党委')
+        elif me == 'ltj':
+            mecha_list.append('离退休干部局')
+        else:
+            mecha_list.append(' ')
+    except Exception as e:
+        print(e)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3314.0 Safari/537.36 SE 2.X MetaSr 1.0'
+    }
+    response = SESSION.get(url, headers=headers)
+    text = response.content.decode('utf8')
+    html = etree.HTML(text)
+    div = html.xpath("//div[@class='w1024 mb50']//div[@class='list']")
+    for d in div:
+        title = d.xpath("./div[@class='tit']/text()")
+        try:
+            title = title[0]
+            print(title)
+            title_list.append(title)
+        except Exception as e:
+            print(e)
+        time_ = d.xpath(".//div[@class='source']/span[1]/text()")
+        try:
+            t = time_[0]
+            t = str(t)
+            t = t.replace('发布时间：', '').replace('\n', '').replace('\r', '').replace(' ', '')
+            print(t)
+            time_list.append(t)
+        except Exception as e:
+            print(e)
+        content = d.xpath(".//div[@id='xw_box']//text()")
+        try:
+            words = ''
+            for c in content:
+                words += c
+            words = words.replace('\r', '').replace('\n', '').replace(' ', '')
+            content_list.append(words)
+        except Exception as e:
+            print(e)
+        time.sleep(0.9)
+
+
+def save_date(result):
+    headers = ['标题', '机构', '时间', '内容']
+    with open('result.csv', 'w',encoding='utf8') as f:
+        writer = csv.writer(f)
+        writer.writerow(headers)
+        for i in result:
+            writer.writerow(i)
+
+
+def main():
+    with open('all_url.csv', 'r') as f:
+        reader = csv.reader(f)
+        for i in reader:
+            parse_url(i[0])
+    f.close()
+    result = zip(title_list, mecha_list, time_list, content_list)
+    save_date(result)
+
+
+if __name__ == '__main__':
+    main()
