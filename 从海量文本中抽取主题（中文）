@@ -1,1 +1,42 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+import jieba
+sample=['山西医科大学还不错','山西医科大学很垃圾']
 
+texts=[]
+for i in range(0,len(sample)):
+  a=''.join(jieba.cut(sample[i])).split()
+  texts.append(a)
+print(texts)
+  
+#  text.append(i.split())
+#print(texts)
+from collections import defaultdict
+ferquency=defaultdict(int)
+for text in texts:
+  for token in text:
+    ferquency[token]+=1
+print(ferquency)
+#过滤低频词
+texts=[[word for word in text if ferquency[word]>1]for text in texts]
+print(text)  
+
+from gensim import corpora,models
+dictionary=corpora.Dictionary(texts)
+print(dictionary)
+
+
+feture=dictionary.token2id.keys()
+print(feture)
+
+corpus=[dictionary.doc2bow(text) for text in texts]
+print(corpus)
+
+models.TfifModel(corpus)
+print(tdidf)
+corpus_tfidf=tfidf[corpus]
+print(corpus_tfidf[0])
+
+ldamodel=models.LdaModel(corpus_tfidf,num_topics=3,id2word=doctionary)
+topic_all=lda.print_topics(num_topics=3,num_words=2)
+for i in topic_all:
+  print(i)
