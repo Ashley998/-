@@ -2,7 +2,7 @@ import jieba
 sentence='精确匹配是怎么一回事呀'
 #精确匹配
 split=jieba.cut(sentence,cut_all=False)
-for item in split
+for item in split：
   print(item)
 split=jieba.cut(sentence,cut_all=False)
 for item in split:
