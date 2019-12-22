@@ -1,0 +1,42 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Feb  8 20:54:26 2017
+
+@author: Administrator
+"""
+import os
+import codecs
+import pandas as pd
+from collections import Counter
+# import jieba
+# jieba.load_userdict("C:/Users/Administrator/desktop/base data/自定义.txt")#如果要自定义词库，就用这块，文件格式可以搜下jieba分词。不会也可以问
+import jieba.posseg as pseg
+w1=os.listdir('F:/in')
+#w1.remove('desktop.ini')
+
+for i in w1:
+    x1=codecs.open('F:/in/'+i,'r','utf-8')
+    x2=x1.read()
+    x1.close()
+    print('读入成功')
+    x3=list(pseg.cut(x2))
+    x4=Counter(x3)
+    y1=[]
+    y2=[]
+    y3=[]
+    y4=[]
+    y5=[]
+    for j in x4:
+        y1.append(x4[j])
+        y2.append(list(j)[0])
+        y3.append(list(j)[1])
+    for k in x3:
+        y4.append(list(k)[0])
+        y5.append(list(k)[1])
+
+    # z1=pd.DataFrame({'分词':y4,'词性':y5})
+    # z1.to_excel('D:/out/'+i+'-分词.xlsx',sheet_name='Sheet1')
+    
+    z2=pd.DataFrame({'分词':y2,'词频':y1,'词性':y3})
+    z2=z2.sort_values(by='词频',ascending=False)
+    z2.to_excel('F:/out/'+i.replace('.txt','')+'-词频统计.xlsx',sheet_name='Sheet1')
