@@ -1,0 +1,21 @@
+import pandas as pd
+
+#df = pd.read_excel('总选取数据库.xlsx', sheet_name='message', names=['标题', '时间', '单位', '内容'], dtype=str)
+
+df = pd.read_excel('总选取数据库.xlsx', sheet_name='result', names=['标题', '时间', '单位', '内容'], dtype=str)
+
+key_word = ['健康教育', '健康促进', '健康宣教',  '卫生教育']
+# 保存数据
+save_data = []
+for ii in range(len(df)):
+    for word in key_word:
+        if word in str(df['标题'][ii]):
+            save_data.append([df['标题'][ii], df['时间'][ii], df['单位'][ii], df['内容'][ii]])
+            break
+        elif word in str(df['内容'][ii]):
+            save_data.append([df['标题'][ii], df['时间'][ii], df['单位'][ii], df['内容'][ii]])
+            break
+# 转换为 DataFrame保存
+df1 = pd.DataFrame(save_data, columns=['标题', '时间', '单位', '内容'])
+#df1.to_excel("message.xls", index=None)
+df1.to_excel("result.xls", index=None)
